@@ -1,0 +1,6 @@
+.idea/
+target/
+firebase_key.json
+results.json
+*.iml
+*.csv
