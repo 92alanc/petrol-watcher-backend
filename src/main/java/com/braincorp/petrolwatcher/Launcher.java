@@ -23,14 +23,16 @@ public class Launcher {
         LOGGER.info("Backend started");
         DatabaseController databaseController = new DatabaseController();
         databaseController.fetchAveragePrices((prices, city, country) -> {
-            String dataSetFile = CsvHelper.createFileFor(prices);
-            PredictionController predictionController = new PredictionController();
-            predictionController.runAiScript(dataSetFile, city, country);
-            predictionController.getPrediction(prediction -> {
-                LOGGER.info("Predictions ready");
-                LOGGER.info("Updating database...");
-                databaseController.updatePrediction(prediction);
-            });
+            String dataSetFile = CsvHelper.getFileFor(prices);
+            if (dataSetFile != null) {
+                PredictionController predictionController = new PredictionController();
+                predictionController.runAiScript(dataSetFile, city, country);
+                predictionController.getPrediction(prediction -> {
+                    LOGGER.info("Predictions ready");
+                    LOGGER.info("Updating database...");
+                    databaseController.updatePrediction(prediction);
+                });
+            }
         });
         Scanner s = new Scanner(System.in);
         s.next();

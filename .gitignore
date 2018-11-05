@@ -1,6 +1,5 @@
 .idea/
 target/
-firebase_key.json
-results.json
+*.json
 *.iml
 *.csv

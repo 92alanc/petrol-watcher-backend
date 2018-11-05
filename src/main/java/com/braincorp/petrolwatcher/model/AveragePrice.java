@@ -30,10 +30,16 @@ public class AveragePrice {
             fuel = fuelType;
         }
 
-        if (fuel.equals("PETROL REGULAR")) {
-            fuel = "GASOLINA COMUM";
-        } else if (fuel.equals("ETHANOL")) {
-            fuel = "ETANOL";
+        switch (fuel) {
+            case "PETROL REGULAR":
+                fuel = "GASOLINA COMUM";
+                break;
+            case "PETROL PREMIUM":
+                fuel = "GASOLINA ADITIVADA";
+                break;
+            case "ETHANOL":
+                fuel = "ETANOL";
+                break;
         }
     }
 
