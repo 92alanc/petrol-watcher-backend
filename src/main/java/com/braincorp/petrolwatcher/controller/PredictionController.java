@@ -19,7 +19,7 @@ public class PredictionController {
      * Runs the AI script to train the neural network
      * with the data set provided
      */
-    public void runAiScript() {
+    public void runAiScript(String dataSetFile, String city, String country) {
         URL scriptUrl = getClass().getClassLoader().getResource("ai.py");
         if (scriptUrl == null) {
             logger.error("Wrong AI script path!");
@@ -27,15 +27,24 @@ public class PredictionController {
         }
 
         String aiScript = scriptUrl.toString();
-        String command = String.format("python3 %1$s %2$s",
+        String command = String.format("python3 %1$s %2$s %3$s %4$s",
                 aiScript,
-                propertiesReader.getPricesDataSetPath());
-        try {
-            logger.info("Running AI script...");
-            Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            logger.error("Error running AI script.", e);
-        }
+                dataSetFile,
+                city,
+                country);
+
+        new Thread() {
+            @Override
+            public synchronized void start() {
+                super.start();
+                try {
+                    logger.info("Running AI script...");
+                    Runtime.getRuntime().exec(command);
+                } catch (IOException e) {
+                    logger.error("Error running AI script.", e);
+                }
+            }
+        }.start();
     }
 
     /**

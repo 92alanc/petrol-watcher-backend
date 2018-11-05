@@ -1,5 +1,6 @@
 package com.braincorp.petrolwatcher.controller;
 
+import com.braincorp.petrolwatcher.callback.AveragePriceCallback;
 import com.braincorp.petrolwatcher.model.Prediction;
 import com.google.firebase.database.*;
 import org.slf4j.Logger;
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseController {
 
+    private static final String KEY_AVERAGE_PRICES = "average_prices";
     private static final String KEY_PREDICTIONS = "predictions";
 
     private Logger logger = LoggerFactory.getLogger(DatabaseController.class);
@@ -15,6 +17,10 @@ public class DatabaseController {
     public DatabaseController() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         reference = database.getReference();
+    }
+
+    public void fetchAveragePrices(AveragePriceCallback callback) {
+        // TODO
     }
 
     /**

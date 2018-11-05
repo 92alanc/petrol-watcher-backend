@@ -12,7 +12,6 @@ public class PropertiesReader {
     private static final String KEY_FIREBASE_KEY_FILE = "firebase.key.file";
     private static final String KEY_FIREBASE_DATABASE_URL = "firebase.database.url";
     private static final String KEY_PREDICTIONS_FILE = "predictions.file";
-    private static final String KEY_PRICES_DATA_SET_PATH = "prices.data.set.path";
 
     private Properties properties;
 
@@ -38,10 +37,6 @@ public class PropertiesReader {
 
     public String getPredictionsFile() {
         return properties.getProperty(KEY_PREDICTIONS_FILE);
-    }
-
-    public String getPricesDataSetPath() {
-        return properties.getProperty(KEY_PRICES_DATA_SET_PATH);
     }
 
 }

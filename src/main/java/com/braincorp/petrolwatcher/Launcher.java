@@ -2,6 +2,7 @@ package com.braincorp.petrolwatcher;
 
 import com.braincorp.petrolwatcher.controller.DatabaseController;
 import com.braincorp.petrolwatcher.controller.PredictionController;
+import com.braincorp.petrolwatcher.utils.CsvHelper;
 import com.braincorp.petrolwatcher.utils.PropertiesReader;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -15,19 +16,21 @@ import java.util.Scanner;
 
 public class Launcher {
 
-    private static Logger logger = LoggerFactory.getLogger(Launcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
 
     public static void main(String[] args) {
         initialiseFirebaseApp();
-        logger.info("Backend started");
-        PredictionController predictionController = new PredictionController();
-        predictionController.runAiScript();
-        predictionController.getPrediction((prediction) -> {
-            logger.info("Predictions ready");
-            logger.info("Updating database...");
-
-            DatabaseController databaseController = new DatabaseController();
-            databaseController.updatePrediction(prediction);
+        LOGGER.info("Backend started");
+        DatabaseController databaseController = new DatabaseController();
+        databaseController.fetchAveragePrices((prices, city, country) -> {
+            String dataSetFile = CsvHelper.createFileFor(prices);
+            PredictionController predictionController = new PredictionController();
+            predictionController.runAiScript(dataSetFile, city, country);
+            predictionController.getPrediction(prediction -> {
+                LOGGER.info("Predictions ready");
+                LOGGER.info("Updating database...");
+                databaseController.updatePrediction(prediction);
+            });
         });
         Scanner s = new Scanner(System.in);
         s.next();
@@ -43,7 +46,7 @@ public class Launcher {
                     .build();
             FirebaseApp.initializeApp(options);
         } catch (IOException e) {
-            logger.error("Error", e);
+            LOGGER.error("Error", e);
         }
     }
 

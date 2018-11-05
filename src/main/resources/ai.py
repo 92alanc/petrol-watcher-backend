@@ -13,7 +13,7 @@ RESULTS = []
 
 def read_csv(csv_file):
     return pd.read_csv(csv_file, sep=',')
-    
+
 def create_model(input_size):
     model = Sequential()
     model.add(LSTM(input_size,return_sequences=True))
@@ -36,16 +36,19 @@ def train(DATA):
         next_week = np.array([max(weeks)[0] + 1]).reshape((1,1,1))
         fuel_price_pred = model.predict(next_week, verbose=0)[0][0]
         append_result(fuel, fuel_price_pred)
-        
+
 def append_result(fuel, price):
     obj = '"%s":%.4f' % (fuel, price)
     RESULTS.append(obj)
 
 def send_results():
-    open('results.json','w').write(str(RESULTS)
-    .replace("'",'')
-    .replace('[','{')
-    .replace(']','}'))
+    city = sys.argv[2]
+    country = sys.argv[3]
+    resultsfile = "results_%s_%s.json" % (city, country)
+    open(resultsfile,'w').write(str(RESULTS)
+                                .replace("'",'')
+                                .replace('[','{')
+                                .replace(']','}'))
 
 if __name__ == '__main__':
     filename = sys.argv[1]
