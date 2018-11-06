@@ -70,8 +70,9 @@ public class PredictionController {
                             logger.info(event.kind().name());
                             String predictionsFile = String.format("results_%1$s_%2$s.json",
                                     city, country);
+                            String area = String.format("%1$s_%2$s", city, country);
                             JsonConverter jsonConverter = new JsonConverter(predictionsFile);
-                            callback.onNewPrediction(jsonConverter.toPrediction());
+                            callback.onNewPrediction(jsonConverter.toPrediction(), area);
                         }
                         key.reset();
                     }

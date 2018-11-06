@@ -2,6 +2,7 @@ package com.braincorp.petrolwatcher.model;
 
 import com.braincorp.petrolwatcher.utils.MapBuilder;
 import com.google.gson.annotations.SerializedName;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Map;
 
@@ -11,7 +12,7 @@ public class Prediction {
     private static final String KEY_ETHANOL = "ethanol";
     private static final String KEY_PETROL_REGULAR = "petrol_regular";
     private static final String KEY_PETROL_PREMIUM = "petrol_premium";
-    // TODO: add city and country
+    private static final String KEY_AREA = "area";
 
     @SerializedName("DIESEL")
     private double diesel;
@@ -25,6 +26,9 @@ public class Prediction {
     @SerializedName("GASOLINA ADITIVADA")
     private double premiumPetrol;
 
+    @JsonIgnore
+    private String area;
+
     /**
      * Converts the object to a map in order
      * to be processed by the Firebase database
@@ -37,7 +41,12 @@ public class Prediction {
                 .put(KEY_ETHANOL, ethanol)
                 .put(KEY_PETROL_REGULAR, regularPetrol)
                 .put(KEY_PETROL_PREMIUM, premiumPetrol)
+                .put(KEY_AREA, area)
                 .build();
+    }
+
+    public String getArea() {
+        return area;
     }
 
     /* **********************************************************
