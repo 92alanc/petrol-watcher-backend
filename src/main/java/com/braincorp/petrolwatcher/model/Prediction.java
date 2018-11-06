@@ -11,6 +11,7 @@ public class Prediction {
     private static final String KEY_ETHANOL = "ethanol";
     private static final String KEY_PETROL_REGULAR = "petrol_regular";
     private static final String KEY_PETROL_PREMIUM = "petrol_premium";
+    // TODO: add city and country
 
     @SerializedName("DIESEL")
     private double diesel;

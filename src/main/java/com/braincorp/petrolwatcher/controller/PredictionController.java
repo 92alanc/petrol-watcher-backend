@@ -7,44 +7,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.*;
+
+import static com.braincorp.petrolwatcher.utils.TextUtils.normalise;
 
 public class PredictionController {
 
     private Logger logger = LoggerFactory.getLogger(PredictionController.class);
     private PropertiesReader propertiesReader = new PropertiesReader();
+    private String city;
+    private String country;
 
     /**
      * Runs the AI script to train the neural network
      * with the data set provided
      */
     public void runAiScript(String dataSetFile, String city, String country) {
-        URL scriptUrl = getClass().getClassLoader().getResource("ai.py");
-        if (scriptUrl == null) {
-            logger.error("Wrong AI script path!");
-            return;
-        }
+        city = normalise(city);
+        country = normalise(country);
 
-        String aiScript = scriptUrl.toString();
+        this.city = city;
+        this.country = country;
+
+        String scriptFile = propertiesReader.getScriptFile();
         String command = String.format("python3 %1$s %2$s %3$s %4$s",
-                aiScript,
+                scriptFile,
                 dataSetFile,
                 city,
                 country);
+        String commandMsg = String.format("Command: %s", command);
+        logger.info(commandMsg);
 
-        new Thread() {
-            @Override
-            public synchronized void start() {
-                super.start();
-                try {
-                    logger.info("Running AI script...");
-                    Runtime.getRuntime().exec(command);
-                } catch (IOException e) {
-                    logger.error("Error running AI script.", e);
-                }
-            }
-        }.start();
+        try {
+            logger.info("Running AI script...");
+            Runtime.getRuntime().exec(command);
+        } catch (IOException e) {
+            logger.error("Error running AI script.", e);
+        }
     }
 
     /**
@@ -69,7 +68,8 @@ public class PredictionController {
                     while ((key = watchService.take()) != null) {
                         for (WatchEvent<?> event : key.pollEvents()) {
                             logger.info(event.kind().name());
-                            String predictionsFile = propertiesReader.getPredictionsFile();
+                            String predictionsFile = String.format("results_%1$s_%2$s.json",
+                                    city, country);
                             JsonConverter jsonConverter = new JsonConverter(predictionsFile);
                             callback.onNewPrediction(jsonConverter.toPrediction());
                         }

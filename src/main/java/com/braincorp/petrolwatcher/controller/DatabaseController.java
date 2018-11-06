@@ -15,17 +15,9 @@ public class DatabaseController {
     private static final String KEY_AVERAGE_PRICES = "average_prices";
     private static final String KEY_PREDICTIONS = "predictions";
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseController.class);
-    private static final FirebaseDatabase DATABASE = FirebaseDatabase.getInstance();
-
-    private DatabaseReference rootReference;
-
-    public DatabaseController() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        rootReference = database.getReference();
-    }
 
     public void fetchAveragePrices(AveragePriceCallback callback) {
-        DatabaseReference reference = DATABASE.getReference(KEY_AVERAGE_PRICES);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(KEY_AVERAGE_PRICES);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -68,10 +60,11 @@ public class DatabaseController {
      * @param prediction the new prediction
      */
     public void updatePrediction(Prediction prediction) {
-        rootReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(KEY_PREDICTIONS).exists())
+                if (dataSnapshot.child(KEY_PREDICTIONS).exists()) // TODO: use ID
                     update(prediction);
                 else
                     insert(prediction);
@@ -85,12 +78,12 @@ public class DatabaseController {
     }
 
     private void insert(Prediction prediction) {
-        rootReference.child(KEY_PREDICTIONS)
+        FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS).child(KEY_PREDICTIONS)
                 .setValue(prediction.toMap(), completionListener);
     }
 
     private void update(Prediction prediction) {
-        rootReference.child(KEY_PREDICTIONS)
+        FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS).child(KEY_PREDICTIONS)
                 .updateChildren(prediction.toMap(), completionListener);
     }
 

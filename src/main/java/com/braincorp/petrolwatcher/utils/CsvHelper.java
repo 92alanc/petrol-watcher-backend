@@ -6,11 +6,14 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.braincorp.petrolwatcher.utils.TextUtils.normalise;
 
 public class CsvHelper {
 
@@ -27,28 +30,64 @@ public class CsvHelper {
         });
 
         try {
+            String city = normalise(prices.get(0).getCity());
+            String country = normalise(prices.get(0).getCountry());
+
             String fileName = String.format("precos_%1$s_%2$s.csv",
-                    prices.get(0).getCity().replace(" ", "").toLowerCase(),
-                    prices.get(0).getCountry().replace(" ", "").toLowerCase());
+                    city,
+                    country);
             File file = new File(fileName);
-            FileWriter writer = null;
+            String week = file.exists() ? String.valueOf(getNewWeekNumber(fileName)) : "1";
 
             if (!file.exists()) {
-                writer = new FileWriter(fileName);
-                String headers = String.join(",", fuels);
-                writer.write(headers);
+                String headers = String.join(",", fuels).concat(",SEMANA");
+                Files.write(Paths.get(fileName), headers.getBytes(), StandardOpenOption.APPEND);
             }
 
-            if (writer == null)
-                writer = new FileWriter(fileName);
-            String line = String.format("\n%s", String.join(",", values));
-            writer.append(line);
-            writer.close();
+            String line = String.format("\n%1$s,%2$s",
+                    String.join(",", values),
+                    week);
+            Files.write(Paths.get(fileName), line.getBytes(), StandardOpenOption.APPEND);
 
             return fileName;
         } catch (IOException e) {
             LOGGER.error("Error writing to CSV file", e);
             return null;
+        }
+    }
+
+    private static int getNewWeekNumber(String fileName) throws IOException {
+        try (InputStream is = new BufferedInputStream(new FileInputStream(fileName))) {
+            byte[] c = new byte[1024];
+
+            int readChars = is.read(c);
+            if (readChars == -1) {
+                // bail out if nothing to read
+                return 0;
+            }
+
+            // make it easy for the optimizer to tune this loop
+            int count = 0;
+            while (readChars == 1024) {
+                for (int i = 0; i < 1024; ) {
+                    if (c[i++] == '\n') {
+                        ++count;
+                    }
+                }
+                readChars = is.read(c);
+            }
+
+            // count remaining characters
+            while (readChars != -1) {
+                for (int i = 0; i < readChars; ++i) {
+                    if (c[i] == '\n') {
+                        ++count;
+                    }
+                }
+                readChars = is.read(c);
+            }
+
+            return count == 0 ? 1 : count + 1;
         }
     }
 
