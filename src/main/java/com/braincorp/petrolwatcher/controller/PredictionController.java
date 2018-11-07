@@ -13,7 +13,8 @@ import static com.braincorp.petrolwatcher.utils.TextUtils.normalise;
 
 public class PredictionController {
 
-    private Logger logger = LoggerFactory.getLogger(PredictionController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PredictionController.class);
+
     private PropertiesReader propertiesReader = new PropertiesReader();
     private String city;
     private String country;
@@ -36,13 +37,13 @@ public class PredictionController {
                 city,
                 country);
         String commandMsg = String.format("Command: %s", command);
-        logger.info(commandMsg);
+        LOGGER.info(commandMsg);
 
         try {
-            logger.info("Running AI script...");
+            LOGGER.info("Running AI script...");
             Runtime.getRuntime().exec(command);
         } catch (IOException e) {
-            logger.error("Error running AI script.", e);
+            LOGGER.error("Error running AI script.", e);
         }
     }
 
@@ -67,7 +68,7 @@ public class PredictionController {
                     WatchKey key;
                     while ((key = watchService.take()) != null) {
                         for (WatchEvent<?> event : key.pollEvents()) {
-                            logger.info(event.kind().name());
+                            LOGGER.info(event.kind().name());
                             String predictionsFile = String.format("results_%1$s_%2$s.json",
                                     city, country);
                             String area = String.format("%1$s_%2$s", city, country);
@@ -77,7 +78,7 @@ public class PredictionController {
                         key.reset();
                     }
                 } catch (IOException | InterruptedException e) {
-                    logger.error("Error finding or parsing results file.", e);
+                    LOGGER.error("Error finding or parsing results file.", e);
                 }
             }
         }.start();
