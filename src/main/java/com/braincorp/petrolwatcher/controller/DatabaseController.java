@@ -66,9 +66,9 @@ public class DatabaseController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child(area).exists())
-                    update(prediction);
+                    update(prediction, reference);
                 else
-                    insert(prediction);
+                    insert(prediction, reference);
             }
 
             @Override
@@ -78,17 +78,21 @@ public class DatabaseController {
         });
     }
 
-    private void insert(Prediction prediction) {
-        FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS).child(prediction.getArea())
+    private void insert(Prediction prediction, DatabaseReference reference) {
+        reference.child(prediction.getArea())
                 .setValue(prediction.toMap(), completionListener);
     }
 
-    private void update(Prediction prediction) {
-        FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS).child(prediction.getArea())
+    private void update(Prediction prediction, DatabaseReference reference) {
+        reference.child(prediction.getArea())
                 .updateChildren(prediction.toMap(), completionListener);
     }
 
-    private DatabaseReference.CompletionListener completionListener = (databaseError, databaseReference) ->
+    private DatabaseReference.CompletionListener completionListener = (databaseError, databaseReference) -> {
+        if (databaseError != null)
+            LOGGER.error("Error updating database", databaseError.toException());
+        else
             LOGGER.info("Predictions updated");
+    };
 
 }
