@@ -62,36 +62,6 @@ public class DatabaseController {
     public void updatePrediction(Prediction prediction) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS);
         reference.child(prediction.getArea()).setValueAsync(prediction.toMap());
-            /*@Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(prediction.getArea()).exists())
-                    update(prediction, reference);
-                else
-                    insert(prediction, reference);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LOGGER.error("Error updating database", databaseError.toException());
-            }
-        });*/
     }
-
-    private void insert(Prediction prediction, DatabaseReference reference) {
-        reference.child(prediction.getArea())
-                .setValue(prediction.toMap(), completionListener);
-    }
-
-    private void update(Prediction prediction, DatabaseReference reference) {
-        reference.child(prediction.getArea())
-                .updateChildren(prediction.toMap(), completionListener);
-    }
-
-    private DatabaseReference.CompletionListener completionListener = (databaseError, databaseReference) -> {
-        if (databaseError != null)
-            LOGGER.error("Error updating database", databaseError.toException());
-        else
-            LOGGER.info("Predictions updated");
-    };
 
 }
