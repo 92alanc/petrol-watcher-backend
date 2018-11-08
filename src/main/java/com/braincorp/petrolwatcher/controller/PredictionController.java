@@ -1,6 +1,7 @@
 package com.braincorp.petrolwatcher.controller;
 
 import com.braincorp.petrolwatcher.callback.PredictionCallback;
+import com.braincorp.petrolwatcher.model.Prediction;
 import com.braincorp.petrolwatcher.utils.JsonConverter;
 import com.braincorp.petrolwatcher.utils.PropertiesReader;
 import org.slf4j.Logger;
@@ -73,7 +74,9 @@ public class PredictionController {
                                     city, country);
                             String area = String.format("%1$s_%2$s", city, country);
                             JsonConverter jsonConverter = new JsonConverter(predictionsFile);
-                            callback.onNewPrediction(jsonConverter.toPrediction(), area);
+                            Prediction prediction = jsonConverter.toPrediction();
+                            prediction.setArea(area);
+                            callback.onNewPrediction(prediction);
                         }
                         key.reset();
                     }

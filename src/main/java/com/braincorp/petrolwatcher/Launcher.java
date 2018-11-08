@@ -27,10 +27,10 @@ public class Launcher {
             if (dataSetFile != null) {
                 PredictionController predictionController = new PredictionController();
                 predictionController.runAiScript(dataSetFile, city, country);
-                predictionController.getPrediction((prediction, area) -> {
+                predictionController.getPrediction(prediction -> {
                     LOGGER.info("Predictions ready");
                     LOGGER.info("Updating database...");
-                    databaseController.updatePrediction(prediction, area);
+                    databaseController.updatePrediction(prediction);
                 });
             }
         });

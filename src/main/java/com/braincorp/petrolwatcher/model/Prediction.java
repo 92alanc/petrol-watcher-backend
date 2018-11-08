@@ -49,6 +49,10 @@ public class Prediction {
         return area;
     }
 
+    public void setArea(String area) {
+        this.area = area;
+    }
+
     /* **********************************************************
      * These getters and setters below are not explicitly being *
      * used but they are necessary for when the prediction JSON *

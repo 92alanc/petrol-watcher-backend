@@ -58,14 +58,13 @@ public class DatabaseController {
     /**
      * Updates the prediction in the database
      * @param prediction the new prediction
-     * @param area the area (city_country)
      */
-    public void updatePrediction(Prediction prediction, String area) {
+    public void updatePrediction(Prediction prediction) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
+        reference.child(prediction.getArea()).setValueAsync(prediction.toMap());
+            /*@Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(area).exists())
+                if (dataSnapshot.child(prediction.getArea()).exists())
                     update(prediction, reference);
                 else
                     insert(prediction, reference);
@@ -75,7 +74,7 @@ public class DatabaseController {
             public void onCancelled(DatabaseError databaseError) {
                 LOGGER.error("Error updating database", databaseError.toException());
             }
-        });
+        });*/
     }
 
     private void insert(Prediction prediction, DatabaseReference reference) {
