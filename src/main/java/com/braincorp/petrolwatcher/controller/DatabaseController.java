@@ -58,10 +58,12 @@ public class DatabaseController {
     /**
      * Updates the prediction in the database
      * @param prediction the new prediction
+     * @param listener the listener to be triggered when
+     *                 the prediction is ready
      */
-    public void updatePrediction(Prediction prediction) {
+    public void updatePrediction(Prediction prediction, DatabaseReference.CompletionListener listener) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(KEY_PREDICTIONS);
-        reference.child(prediction.getArea()).setValueAsync(prediction.toMap());
+        reference.child(prediction.getArea()).setValue(prediction.toMap(), listener);
     }
 
 }

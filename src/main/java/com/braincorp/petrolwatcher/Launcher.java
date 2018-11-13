@@ -29,8 +29,7 @@ public class Launcher {
                 predictionController.runAiScript(dataSetFile, city, country);
                 predictionController.getPrediction(prediction -> {
                     LOGGER.info("Predictions ready");
-                    databaseController.updatePrediction(prediction);
-                    LOGGER.info("Predictions exported");
+                    databaseController.updatePrediction(prediction, (databaseError, databaseReference) -> LOGGER.info("Predictions exported"));
                 });
             }
         });
