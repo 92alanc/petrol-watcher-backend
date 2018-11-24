@@ -31,7 +31,11 @@ public class CsvHelper {
 
         try {
             String city = normalise(prices.get(0).getCity());
-            String country = normalise(prices.get(0).getCountry());
+            String country;
+            if (normalise(prices.get(0).getCountry()).equals("Brazil"))
+                country = "Brasil";
+            else
+                country = normalise(prices.get(0).getCountry());
 
             String fileName = String.format("precos_%1$s_%2$s.csv",
                     city,
@@ -40,8 +44,10 @@ public class CsvHelper {
             String week = file.exists() ? String.valueOf(getNewWeekNumber(fileName)) : "1";
 
             if (!file.exists()) {
-                String headers = String.join(",", fuels).concat(",SEMANA");
-                Files.write(Paths.get(fileName), headers.getBytes(), StandardOpenOption.APPEND);
+                if (file.createNewFile()) {
+                    String headers = String.join(",", fuels).concat(",SEMANA");
+                    Files.write(Paths.get(fileName), headers.getBytes(), StandardOpenOption.APPEND);
+                }
             }
 
             String line = String.format("\n%1$s,%2$s",

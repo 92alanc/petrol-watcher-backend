@@ -16,6 +16,9 @@ public class DatabaseController {
     private static final String KEY_PREDICTIONS = "predictions";
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseController.class);
 
+    private String city, country;
+    private List<AveragePrice> prices;
+
     public void fetchAveragePrices(AveragePriceCallback callback) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(KEY_AVERAGE_PRICES);
         reference.addValueEventListener(new ValueEventListener() {
@@ -23,29 +26,40 @@ public class DatabaseController {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<AveragePrice> allPrices = new ArrayList<>();
                 List<String> citiesAndCountries = new ArrayList<>();
+                prices = new ArrayList<>();
                 dataSnapshot.getChildren().forEach(it -> {
                     AveragePrice averagePrice = new AveragePrice(it);
                     allPrices.add(averagePrice);
+                    LOGGER.info("Price found: " + averagePrice.getPrice());
                     String cityAndCountry = String.format("%1$s_%2$s",
                             averagePrice.getCity(),
                             averagePrice.getCountry());
+                    LOGGER.info("City and country: " + cityAndCountry);
                     if (!citiesAndCountries.contains(cityAndCountry))
                         citiesAndCountries.add(cityAndCountry);
                 });
 
                 citiesAndCountries.forEach(cityAndCountry -> {
-                    List<AveragePrice> pricesInCityAndCountry = new ArrayList<>();
                     allPrices.forEach(price -> {
                         String cityAndCountry2 = String.format("%1$s_%2$s",
                                 price.getCity(),
                                 price.getCountry());
-                        if (cityAndCountry2.equals(cityAndCountry))
-                            pricesInCityAndCountry.add(price);
+                        if (cityAndCountry2.equals(cityAndCountry)) {
+                            prices.add(price);
+                            LOGGER.info("Price in city and country: " + price.getPrice());
+                        }
                     });
-                    String city = cityAndCountry.split("_")[0];
-                    String country = cityAndCountry.split("_")[1];
-                    callback.onAveragePricesReceived(pricesInCityAndCountry, city, country);
+                    city = cityAndCountry.split("_")[0];
+                    if (cityAndCountry.split("_")[1].equals("Brazil"))
+                        country = "Brasil";
+                    else
+                        country = cityAndCountry.split("_")[1];
+                    LOGGER.info("Area: " + cityAndCountry);
                 });
+
+                LOGGER.info("Prices found: " + prices.size());
+                if (prices.size() == 4)
+                    callback.onAveragePricesReceived(prices, city, country);
             }
 
             @Override
